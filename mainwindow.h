@@ -24,6 +24,8 @@ protected:
 private slots:
     void updateGame();
     void onLevelSelected(int level);
+    void onNextLevel();
+    void onExitToMenu();
 
 private:
     GameState gameState;
@@ -32,9 +34,11 @@ private:
     QTimer *timer;
     QPushButton *startButton, *guideButton, *exitButton, *backButton;
     QPushButton *level1Btn, *level2Btn, *level3Btn;
+    QPushButton *nextLevelButton, *exitAfterLevelButton;
 
-    // 图片资源（直接加载外部文件）
-    QPixmap background, piggy, lulu, xiongda, xionger, guangtouqiang;
+    // 三关背景
+    QPixmap bg1, bg2, bg3;
+    QPixmap piggy, lulu, xiongda, xionger, guangtouqiang;
     QPixmap housePic, zombiePic, obstaclePic, startCover, guidePage, levelMapPic;
     QPixmap fartEffectPic, heartPic;
 
@@ -44,7 +48,6 @@ private:
     void initUI();
     void loadImages();
     void drawGame(QPainter &painter);
-    void drawPlayerWithCarry(QPainter &painter, const Player &p, const QPixmap &basePic);
 };
 
 #endif // MAINWINDOW_H

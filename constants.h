@@ -6,6 +6,7 @@ enum GameState {
     GUIDE,
     LEVEL_SELECT,
     PLAYING,
+    LEVEL_COMPLETE,
     GAME_OVER,
     VICTORY
 };

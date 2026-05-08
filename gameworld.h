@@ -35,7 +35,6 @@ public:
     void update();
     void setInput(bool a, bool d, bool left, bool right, bool wJump, bool upJump, bool qAttack, bool kAttack);
 
-    // 访问器
     Player& getPlayer1() { return p1; }
     Player& getPlayer2() { return p2; }
     const QVector<Platform>& getPlatforms() const { return platforms; }
@@ -49,8 +48,11 @@ public:
     int getCurrentLevel() const { return currentLevel; }
     bool isGameOver() const { return gameOverFlag; }
     bool isVictory() const { return victoryFlag; }
+    bool isLevelComplete() const { return levelCompleteFlag; }
+    const QVector<int>& getSavedList() const { return savedList; }
 
     void resetToMenu();
+    void nextLevel();
 
 private:
     Player p1, p2;
@@ -59,6 +61,7 @@ private:
     float mapOffset;
     bool gameOverFlag;
     bool victoryFlag;
+    bool levelCompleteFlag;
 
     QVector<Platform> platforms;
     QVector<Obstacle> obstacles;
@@ -71,6 +74,10 @@ private:
     bool wPressed, upPressed;
     bool qPressed, kPressed;
     int attackCooldown1, attackCooldown2;
+
+    QVector<int> savedList;
+
+    int invincibleFrames;
 
     void loadLevel(int level);
     void applyGravityAndPlatform(Player &p);
