@@ -23,22 +23,36 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {}
 
 void MainWindow::loadImages() {
-    // 三关背景（与其它图片路径一致）
     bg1 = QPixmap("res/background1.png");
     bg2 = QPixmap("res/background2.png");
     bg3 = QPixmap("res/background3.png");
-    // 如果某个背景加载失败，输出警告
-    if (bg1.isNull()) qDebug() << "Failed to load res/background1.png";
-    if (bg2.isNull()) qDebug() << "Failed to load res/background2.png";
-    if (bg3.isNull()) qDebug() << "Failed to load res/background3.png";
 
     piggy = QPixmap("res/piggy.png");
     lulu = QPixmap("res/lulu.png");
+
     xiongda = QPixmap("res/xiongda.png");
     xionger = QPixmap("res/xionger.png");
     guangtouqiang = QPixmap("res/guangtouqiang.png");
+
+    tutu = QPixmap("res/tutu.png");
+    xiaomei = QPixmap("res/xiaomei.png");
+    xiaoguai = QPixmap("res/xiaoguai.png");
+    shuazi = QPixmap("res/shuazi.png");
+
+    xiyangyang = QPixmap("res/xiyangyang.png");
+    meiyangyang = QPixmap("res/meiyangyang.png");
+    nuanyangyang = QPixmap("res/nuanyangyang.png");
+    feiyangyang = QPixmap("res/feiyangyang.png");
+    lanyangyang = QPixmap("res/lanyangyang.png");
+
     housePic = QPixmap("res/house.png");
+    house2Pic = QPixmap("res/house2.png");
+    house3Pic = QPixmap("res/house3.png");
+
     zombiePic = QPixmap("res/zombie.png");
+    tutumaPic = QPixmap("res/tutuma.png");
+    huitailangPic = QPixmap("res/huitailang.png");
+
     obstaclePic = QPixmap("res/obstacle.png");
     startCover = QPixmap("res/start_cover.png");
     guidePage = QPixmap("res/guide_page.png");
@@ -62,14 +76,14 @@ void MainWindow::initUI() {
     guideButton->setGeometry(250, 320, 300, 70);
     exitButton->setGeometry(250, 420, 300, 70);
     backButton->setGeometry(20, 20, 100, 50);
-    level1Btn->setGeometry(200, 400, 150, 60);
-    level2Btn->setGeometry(300, 340, 150, 60);
-    level3Btn->setGeometry(400, 280, 150, 60);
+    level1Btn->setGeometry(100, 420, 150, 60);
+    level2Btn->setGeometry(300, 300, 150, 60);
+    level3Btn->setGeometry(550, 180, 150, 60);
     nextLevelButton->setGeometry(300, 350, 200, 60);
     exitAfterLevelButton->setGeometry(300, 450, 200, 60);
 
-    QString btnStyle = "QPushButton{background-color:#66CCFF;color:white;font-size:28px;border-radius:15px;border:3px solid white;}";
-    QString smallStyle = "QPushButton{background-color:#55BB55;color:white;font-size:20px;border-radius:10px;}";
+    QString btnStyle = "QPushButton{background-color:#A8E6A3;color:white;font-size:28px;border-radius:15px;border:3px solid white;}";
+    QString smallStyle = "QPushButton{background-color:#A8E6A3;color:white;font-size:20px;border-radius:10px;border:2px solid white;}";
     QString backWhiteStyle = "QPushButton{background-color:#444444;color:white;font-size:20px;border-radius:10px;}";
 
     startButton->setStyleSheet(btnStyle);
@@ -216,14 +230,15 @@ void MainWindow::paintEvent(QPaintEvent *) {
         painter.setFont(QFont("微软雅黑",20));
         painter.drawText(100,220,"玩家1：W跳跃  A/D移动  Q攻击");
         painter.drawText(100,300,"玩家2：↑跳跃  ←→移动  K攻击");
-        painter.drawText(100,380,"收集熊大/熊二/光头强并送回房子");
-        painter.drawText(100,460,"注意躲避僵尸（可攻击）和障碍物");
+        painter.drawText(100,380,"你们的任务就是拾取童年回忆");
+        painter.drawText(100,460,"小心有人会攻击你，你也可以反击");
         break;
     case LEVEL_SELECT:
         painter.drawPixmap(0,0,800,600, levelMapPic);
-        painter.setPen(Qt::yellow);
-        painter.setFont(QFont("微软雅黑",30,QFont::Bold));
-        painter.drawText(280,80,"选择关卡");
+        painter.setPen(QColor(255, 255, 0)); // 荧光黄
+        painter.setFont(QFont("微软雅黑", 36, QFont::Bold));
+        // 顶部居中：y = 60
+        painter.drawText(QRect(0, 60, 800, 100), Qt::AlignCenter, "选择关卡");
         break;
     case PLAYING:
         drawGame(painter);
@@ -258,13 +273,10 @@ void MainWindow::drawGame(QPainter &painter) {
     float mapOffset = gameWorld.getMapOffset();
     int level = gameWorld.getCurrentLevel();
 
-    // 根据关卡选择背景
     QPixmap currentBg;
     if (level == 1) currentBg = bg1;
     else if (level == 2) currentBg = bg2;
-    else if (level == 3) currentBg = bg3;
-
-    // 如果背景无效，使用纯色
+    else currentBg = bg3;
     if (currentBg.isNull()) {
         painter.fillRect(0,0,800,600, QColor(50,150,50));
     } else {
@@ -274,9 +286,20 @@ void MainWindow::drawGame(QPainter &painter) {
         }
     }
 
-    painter.fillRect(0,520,800,80, QColor(100,180,70));
+    QColor groundColor, platformColor;
+    if (level == 1) {
+        groundColor = QColor(0, 100, 0);
+        platformColor = QColor(0, 100, 0);
+    } else if (level == 2) {
+        groundColor = QColor(200, 200, 200);
+        platformColor = QColor(200, 200, 200);
+    } else {
+        groundColor = QColor(245, 222, 179);
+        platformColor = QColor(245, 222, 179);
+    }
+    painter.fillRect(0,520,800,80, groundColor);
 
-    painter.setBrush(QColor(144,238,144));
+    painter.setBrush(platformColor);
     painter.setPen(Qt::NoPen);
     for(auto &plat : gameWorld.getPlatforms()) {
         QRectF screenRect = plat.rect();
@@ -289,17 +312,37 @@ void MainWindow::drawGame(QPainter &painter) {
     }
 
     for(auto &z : gameWorld.getZombies()) {
-        if(z.alive)
-            painter.drawPixmap(z.x - mapOffset, z.y, 50, 70, zombiePic);
+        if(z.alive) {
+            if (level == 1) painter.drawPixmap(z.x - mapOffset, z.y, 50, 70, zombiePic);
+            else if (level == 2) painter.drawPixmap(z.x - mapOffset, z.y, 50, 70, tutumaPic);
+            else painter.drawPixmap(z.x - mapOffset, z.y, 50, 70, huitailangPic);
+        }
     }
 
     for(auto &c : gameWorld.getCollectibles()) {
         if(!c.exists) continue;
-        QPixmap pic = (c.type == XIONGDA ? xiongda : (c.type == XIONGER ? xionger : guangtouqiang));
+        QPixmap pic;
+        switch(c.type) {
+        case XIONGDA: pic = xiongda; break;
+        case XIONGER: pic = xionger; break;
+        case GUANGTOUQIANG: pic = guangtouqiang; break;
+        case TUTU: pic = tutu; break;
+        case XIAOMEI: pic = xiaomei; break;
+        case XIAOGUAI: pic = xiaoguai; break;
+        case SHUAZI: pic = shuazi; break;
+        case XIYANGYANG: pic = xiyangyang; break;
+        case MEIYANGYANG: pic = meiyangyang; break;
+        case NUANYANGYANG: pic = nuanyangyang; break;
+        case FEIYANGYANG: pic = feiyangyang; break;
+        case LANYANGYANG: pic = lanyangyang; break;
+        default: continue;
+        }
         painter.drawPixmap(c.x - mapOffset, c.y, 50, 60, pic);
     }
 
-    painter.drawPixmap(gameWorld.getHouseX() - mapOffset, gameWorld.getHouseY(), 150, 150, housePic);
+    if (level == 1) painter.drawPixmap(gameWorld.getHouseX() - mapOffset, gameWorld.getHouseY(), 150, 150, housePic);
+    else if (level == 2) painter.drawPixmap(gameWorld.getHouseX() - mapOffset, gameWorld.getHouseY(), 150, 150, house2Pic);
+    else painter.drawPixmap(gameWorld.getHouseX() - mapOffset, gameWorld.getHouseY(), 150, 150, house3Pic);
 
     float p1x = gameWorld.getPlayer1().x - mapOffset;
     float p1y = gameWorld.getPlayer1().y;
@@ -309,18 +352,46 @@ void MainWindow::drawGame(QPainter &painter) {
     painter.drawPixmap(p2x, p2y, 60, 80, lulu);
 
     if(gameWorld.getPlayer1().carryCount > 0) {
+        int type = gameWorld.getPlayer1().carryType;
         QPixmap carryPic;
-        if(gameWorld.getPlayer1().carryXiongDa) carryPic = xiongda;
-        else if(gameWorld.getPlayer1().carryXiongEr) carryPic = xionger;
-        else carryPic = guangtouqiang;
-        painter.drawPixmap(p1x+5, p1y-50, 50, 60, carryPic);
+        switch(type) {
+        case XIONGDA: carryPic = xiongda; break;
+        case XIONGER: carryPic = xionger; break;
+        case GUANGTOUQIANG: carryPic = guangtouqiang; break;
+        case TUTU: carryPic = tutu; break;
+        case XIAOMEI: carryPic = xiaomei; break;
+        case XIAOGUAI: carryPic = xiaoguai; break;
+        case SHUAZI: carryPic = shuazi; break;
+        case XIYANGYANG: carryPic = xiyangyang; break;
+        case MEIYANGYANG: carryPic = meiyangyang; break;
+        case NUANYANGYANG: carryPic = nuanyangyang; break;
+        case FEIYANGYANG: carryPic = feiyangyang; break;
+        case LANYANGYANG: carryPic = lanyangyang; break;
+        default: carryPic = QPixmap();
+        }
+        if (!carryPic.isNull())
+            painter.drawPixmap(p1x+5, p1y-50, 50, 60, carryPic);
     }
     if(gameWorld.getPlayer2().carryCount > 0) {
+        int type = gameWorld.getPlayer2().carryType;
         QPixmap carryPic;
-        if(gameWorld.getPlayer2().carryXiongDa) carryPic = xiongda;
-        else if(gameWorld.getPlayer2().carryXiongEr) carryPic = xionger;
-        else carryPic = guangtouqiang;
-        painter.drawPixmap(p2x+5, p2y-50, 50, 60, carryPic);
+        switch(type) {
+        case XIONGDA: carryPic = xiongda; break;
+        case XIONGER: carryPic = xionger; break;
+        case GUANGTOUQIANG: carryPic = guangtouqiang; break;
+        case TUTU: carryPic = tutu; break;
+        case XIAOMEI: carryPic = xiaomei; break;
+        case XIAOGUAI: carryPic = xiaoguai; break;
+        case SHUAZI: carryPic = shuazi; break;
+        case XIYANGYANG: carryPic = xiyangyang; break;
+        case MEIYANGYANG: carryPic = meiyangyang; break;
+        case NUANYANGYANG: carryPic = nuanyangyang; break;
+        case FEIYANGYANG: carryPic = feiyangyang; break;
+        case LANYANGYANG: carryPic = lanyangyang; break;
+        default: carryPic = QPixmap();
+        }
+        if (!carryPic.isNull())
+            painter.drawPixmap(p2x+5, p2y-50, 50, 60, carryPic);
     }
 
     if(fartTimer1 > 0)
@@ -343,6 +414,16 @@ void MainWindow::drawGame(QPainter &painter) {
         case XIONGDA: icon = xiongda; break;
         case XIONGER: icon = xionger; break;
         case GUANGTOUQIANG: icon = guangtouqiang; break;
+        case TUTU: icon = tutu; break;
+        case XIAOMEI: icon = xiaomei; break;
+        case XIAOGUAI: icon = xiaoguai; break;
+        case SHUAZI: icon = shuazi; break;
+        case XIYANGYANG: icon = xiyangyang; break;
+        case MEIYANGYANG: icon = meiyangyang; break;
+        case NUANYANGYANG: icon = nuanyangyang; break;
+        case FEIYANGYANG: icon = feiyangyang; break;
+        case LANYANGYANG: icon = lanyangyang; break;
+        default: continue;
         }
         if (!icon.isNull())
             painter.drawPixmap(100 + i*45, 80, 35, 35, icon);

@@ -12,10 +12,8 @@ public:
     float vy;
     bool onGround;
 
-    bool carryXiongDa;
-    bool carryXiongEr;
-    bool carryGuang;
-    int carryCount;
+    int carryCount;      // 0 或 1
+    int carryType;       // 存储当前携带的 CollectibleType 枚举值，-1 表示无
 
     QRectF rect() const { return QRectF(x, y, 60, 80); }
     void applyGravity();

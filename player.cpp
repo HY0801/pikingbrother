@@ -1,16 +1,15 @@
 #include "player.h"
 #include "constants.h"
 
-Player::Player() : x(0), y(0), vy(0), onGround(true),
-    carryXiongDa(false), carryXiongEr(false), carryGuang(false), carryCount(0) {}
+Player::Player() : x(0), y(0), vy(0), onGround(true), carryCount(0), carryType(-1) {}
 
 void Player::reset(float startX, float startY) {
     x = startX;
     y = startY;
     vy = 0;
     onGround = true;
-    carryXiongDa = carryXiongEr = carryGuang = false;
     carryCount = 0;
+    carryType = -1;
 }
 
 void Player::applyGravity() {

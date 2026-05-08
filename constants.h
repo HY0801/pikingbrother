@@ -11,10 +11,22 @@ enum GameState {
     VICTORY
 };
 
+// 第一关角色类型
 enum CollectibleType {
     XIONGDA,
     XIONGER,
-    GUANGTOUQIANG
+    GUANGTOUQIANG,
+    // 第二关角色
+    TUTU,
+    XIAOMEI,
+    XIAOGUAI,
+    SHUAZI,
+    // 第三关角色
+    XIYANGYANG,
+    MEIYANGYANG,
+    NUANYANGYANG,
+    FEIYANGYANG,
+    LANYANGYANG
 };
 
 const float GRAVITY = 0.7f;

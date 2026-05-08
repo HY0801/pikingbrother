@@ -36,11 +36,22 @@ private:
     QPushButton *level1Btn, *level2Btn, *level3Btn;
     QPushButton *nextLevelButton, *exitAfterLevelButton;
 
-    // 三关背景
+    // 背景
     QPixmap bg1, bg2, bg3;
-    QPixmap piggy, lulu, xiongda, xionger, guangtouqiang;
-    QPixmap housePic, zombiePic, obstaclePic, startCover, guidePage, levelMapPic;
-    QPixmap fartEffectPic, heartPic;
+    // 玩家
+    QPixmap piggy, lulu;
+    // 第一关角色
+    QPixmap xiongda, xionger, guangtouqiang;
+    // 第二关角色
+    QPixmap tutu, xiaomei, xiaoguai, shuazi;
+    // 第三关角色
+    QPixmap xiyangyang, meiyangyang, nuanyangyang, feiyangyang, lanyangyang;
+    // 房子
+    QPixmap housePic, house2Pic, house3Pic;
+    // 敌人
+    QPixmap zombiePic, tutumaPic, huitailangPic;
+    // 其他
+    QPixmap obstaclePic, startCover, guidePage, levelMapPic, fartEffectPic, heartPic;
 
     int fartTimer1, fartTimer2;
     QPointF fartPos1, fartPos2;
