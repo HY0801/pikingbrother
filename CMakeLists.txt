@@ -10,7 +10,15 @@ qt_add_executable(DoublePlayerGame
     main.cpp
     mainwindow.cpp
     mainwindow.h
+    player.cpp
+    player.h
+    gameworld.cpp
+    gameworld.h
+    constants.h
     resources.qrc
+    player.h player.cpp
+    gameworld.h gameworld.cpp
+    constants.h
 
 )
 

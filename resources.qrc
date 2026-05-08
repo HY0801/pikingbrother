@@ -3,14 +3,14 @@
         <file>res/background.png</file>
         <file>res/lulu.png</file>
         <file>res/piggy.png</file>
-        <file>res/fart.png</file>
+        <file>res/fart_effect.png</file>
         <file>res/guangtouqiang.png</file>
-        <file>res/guide_bg.png</file>
+        <file>res/guide_page.png</file>
         <file>res/heart.png</file>
         <file>res/house.png</file>
-        <file>res/levelmap.png</file>
+        <file>res/level_map.png</file>
         <file>res/obstacle.png</file>
-        <file>res/start_btn.png</file>
+        <file>res/start_cover.png</file>
         <file>res/xiongda.png</file>
         <file>res/xionger.png</file>
         <file>res/zombie.png</file>
