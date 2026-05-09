@@ -16,10 +16,6 @@ qt_add_executable(DoublePlayerGame
     gameworld.h
     constants.h
     resources.qrc
-    player.h player.cpp
-    gameworld.h gameworld.cpp
-    constants.h
-
 )
 
 target_link_libraries(DoublePlayerGame

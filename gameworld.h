@@ -51,6 +51,9 @@ public:
     bool isLevelComplete() const { return levelCompleteFlag; }
     const QVector<int>& getSavedList() const { return savedList; }
 
+    int getAttackEffectTimer1() const { return attackEffectTimer1; }
+    int getAttackEffectTimer2() const { return attackEffectTimer2; }
+
     void resetToMenu();
     void nextLevel();
 
@@ -74,6 +77,7 @@ private:
     bool wPressed, upPressed;
     bool qPressed, kPressed;
     int attackCooldown1, attackCooldown2;
+    int attackEffectTimer1, attackEffectTimer2;   // 新增攻击特效计时
 
     QVector<int> savedList;
 

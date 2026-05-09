@@ -8,7 +8,7 @@ GameWorld::GameWorld()
     levelCompleteFlag(false),
     aPressed(false), dPressed(false), leftPressed(false), rightPressed(false),
     wPressed(false), upPressed(false), qPressed(false), kPressed(false),
-    attackCooldown1(0), attackCooldown2(0), invincibleFrames(0)
+    attackCooldown1(0), attackCooldown2(0), attackEffectTimer1(0), attackEffectTimer2(0), invincibleFrames(0)
 {
     loadLevel(1);
     resetPositions();
@@ -23,6 +23,7 @@ void GameWorld::init(int level) {
     levelCompleteFlag = false;
     mapOffset = 0;
     attackCooldown1 = attackCooldown2 = 0;
+    attackEffectTimer1 = attackEffectTimer2 = 0;
     savedList.clear();
     invincibleFrames = 30;
     loadLevel(currentLevel);
@@ -49,7 +50,6 @@ void GameWorld::loadLevel(int level) {
     houseY = 440;
 
     if (level == 1) {
-        // 第一关保持不变
         obstacles.push_back({800, 480, 60, 60});
         obstacles.push_back({1500, 480, 60, 60});
 
@@ -70,56 +70,41 @@ void GameWorld::loadLevel(int level) {
         zombies.push_back({1800, 440, 2, true});
     }
     else if (level == 2) {
-        // 障碍物
         obstacles.push_back({700, 480, 60, 60});
         obstacles.push_back({1200, 480, 60, 60});
         obstacles.push_back({1800, 480, 60, 60});
 
-        // 第二关：四个高台，间距缩短到 130 左右，高度差适中
-        // 第一阶（低）
         platforms.push_back({2300, 460, 120, 20});
         collectibles.push_back({2360, 390, TUTU, true});
-        // 第二阶（稍高），水平距离 130
         platforms.push_back({2430, 400, 120, 20});
         collectibles.push_back({2490, 330, XIAOMEI, true});
-        // 第三阶（更高），水平距离 130
         platforms.push_back({2560, 340, 120, 20});
         collectibles.push_back({2620, 270, XIAOGUAI, true});
-        // 第四阶（最高），水平距离 130
         platforms.push_back({2690, 280, 120, 20});
         collectibles.push_back({2750, 210, SHUAZI, true});
 
-        // 第二关敌人：4个图图妈
         zombies.push_back({1100, 440, -2, true});
         zombies.push_back({1600, 440, 2, true});
         zombies.push_back({2100, 440, -1, true});
         zombies.push_back({2800, 440, 1, true});
     }
     else if (level == 3) {
-        // 障碍物
         obstacles.push_back({600, 480, 60, 60});
         obstacles.push_back({1100, 480, 60, 60});
         obstacles.push_back({1600, 480, 60, 60});
         obstacles.push_back({2100, 480, 60, 60});
 
-        // 第三关：五个高台，间距紧凑（130左右），高度差逐步增大
-        // 第一阶（低）
         platforms.push_back({2500, 460, 120, 20});
         collectibles.push_back({2560, 390, XIYANGYANG, true});
-        // 第二阶
         platforms.push_back({2630, 400, 120, 20});
         collectibles.push_back({2690, 330, MEIYANGYANG, true});
-        // 第三阶
         platforms.push_back({2760, 340, 120, 20});
         collectibles.push_back({2820, 270, NUANYANGYANG, true});
-        // 第四阶
         platforms.push_back({2890, 280, 120, 20});
         collectibles.push_back({2950, 210, FEIYANGYANG, true});
-        // 第五阶（最高）
         platforms.push_back({3020, 220, 120, 20});
         collectibles.push_back({3080, 150, LANYANGYANG, true});
 
-        // 第三关敌人：6个灰太狼
         zombies.push_back({900, 440, -2, true});
         zombies.push_back({1300, 440, 2, true});
         zombies.push_back({1800, 440, -1, true});
@@ -129,7 +114,6 @@ void GameWorld::loadLevel(int level) {
     }
 }
 
-// 以下所有函数保持不变（与上一版完全相同，此处因篇幅略写，请确保完整复制）
 void GameWorld::setInput(bool a, bool d, bool left, bool right, bool w, bool up, bool q, bool k) {
     aPressed = a; dPressed = d;
     leftPressed = left; rightPressed = right;
@@ -163,8 +147,10 @@ void GameWorld::update() {
 
     if(attackCooldown1 > 0) attackCooldown1--;
     if(attackCooldown2 > 0) attackCooldown2--;
+
     if(qPressed && attackCooldown1 == 0) {
         attackCooldown1 = 15;
+        attackEffectTimer1 = 20;   // 改为20，延长变身时间
         QRectF attackRect(p1.x-40, p1.y, 140, 80);
         for(auto& z : zombies) {
             if(z.alive && attackRect.intersects(z.rect()))
@@ -173,6 +159,7 @@ void GameWorld::update() {
     }
     if(kPressed && attackCooldown2 == 0) {
         attackCooldown2 = 15;
+        attackEffectTimer2 = 20;   // 改为20
         QRectF attackRect(p2.x-40, p2.y, 140, 80);
         for(auto& z : zombies) {
             if(z.alive && attackRect.intersects(z.rect()))
@@ -186,6 +173,9 @@ void GameWorld::update() {
     checkCollectAndDelivery();
     checkDeathAndRespawn();
     checkLevelComplete();
+
+    if(attackEffectTimer1 > 0) attackEffectTimer1--;
+    if(attackEffectTimer2 > 0) attackEffectTimer2--;
 }
 
 void GameWorld::applyGravityAndPlatform(Player &p) {
@@ -326,6 +316,7 @@ void GameWorld::resetToMenu() {
     levelCompleteFlag = false;
     mapOffset = 0;
     attackCooldown1 = attackCooldown2 = 0;
+    attackEffectTimer1 = attackEffectTimer2 = 0;
     savedList.clear();
     invincibleFrames = 30;
     loadLevel(currentLevel);

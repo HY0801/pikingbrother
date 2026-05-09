@@ -4,11 +4,11 @@
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), gameState(MENU), fartTimer1(0), fartTimer2(0)
+    : QMainWindow(parent), gameState(MENU), fartTimer1(0), fartTimer2(0), pendingLevel(1)
 {
     resize(800, 600);
     setFixedSize(800, 600);
-    setWindowTitle("猪猪侠双人冒险");
+
 
     loadImages();
     initUI();
@@ -29,6 +29,8 @@ void MainWindow::loadImages() {
 
     piggy = QPixmap("res/piggy.png");
     lulu = QPixmap("res/lulu.png");
+    piggySuper = QPixmap("res/piggy_super.png");
+    luluSuper = QPixmap("res/lulu_super.png");
 
     xiongda = QPixmap("res/xiongda.png");
     xionger = QPixmap("res/xionger.png");
@@ -58,7 +60,14 @@ void MainWindow::loadImages() {
     guidePage = QPixmap("res/guide_page.png");
     levelMapPic = QPixmap("res/level_map.png");
     fartEffectPic = QPixmap("res/fart_effect.png");
+    attackEffectPic = QPixmap("res/gongji_effect.png");
     heartPic = QPixmap("res/heart.png");
+    failBg = QPixmap("res/shibai_bg.png");
+    endBg = QPixmap("res/end.png");
+
+    preludePic1 = QPixmap("res/start1.png");
+    preludePic2 = QPixmap("res/start2.png");
+    preludePic3 = QPixmap("res/start3.png");
 }
 
 void MainWindow::initUI() {
@@ -71,6 +80,7 @@ void MainWindow::initUI() {
     level3Btn = new QPushButton("第3关", this);
     nextLevelButton = new QPushButton("下一关", this);
     exitAfterLevelButton = new QPushButton("退出到菜单", this);
+    preludeStartButton = new QPushButton("开始游戏", this);
 
     startButton->setGeometry(250, 220, 300, 70);
     guideButton->setGeometry(250, 320, 300, 70);
@@ -81,10 +91,12 @@ void MainWindow::initUI() {
     level3Btn->setGeometry(550, 180, 150, 60);
     nextLevelButton->setGeometry(300, 350, 200, 60);
     exitAfterLevelButton->setGeometry(300, 450, 200, 60);
+    preludeStartButton->setGeometry(300, 480, 200, 60);
 
     QString btnStyle = "QPushButton{background-color:#A8E6A3;color:white;font-size:28px;border-radius:15px;border:3px solid white;}";
     QString smallStyle = "QPushButton{background-color:#A8E6A3;color:white;font-size:20px;border-radius:10px;border:2px solid white;}";
     QString backWhiteStyle = "QPushButton{background-color:#444444;color:white;font-size:20px;border-radius:10px;}";
+    QString yellowBigStyle = "QPushButton{background-color:#FFD700;color:black;font-size:28px;border-radius:15px;border:3px solid white;}";
 
     startButton->setStyleSheet(btnStyle);
     guideButton->setStyleSheet(btnStyle);
@@ -95,6 +107,7 @@ void MainWindow::initUI() {
     level3Btn->setStyleSheet(smallStyle);
     nextLevelButton->setStyleSheet(smallStyle);
     exitAfterLevelButton->setStyleSheet(smallStyle);
+    preludeStartButton->setStyleSheet(yellowBigStyle);
 
     backButton->hide();
     level1Btn->hide();
@@ -102,6 +115,7 @@ void MainWindow::initUI() {
     level3Btn->hide();
     nextLevelButton->hide();
     exitAfterLevelButton->hide();
+    preludeStartButton->hide();
 
     connect(startButton, &QPushButton::clicked, [=]() {
         gameState = LEVEL_SELECT;
@@ -130,25 +144,46 @@ void MainWindow::initUI() {
             level1Btn->hide(); level2Btn->hide(); level3Btn->hide();
             nextLevelButton->hide(); exitAfterLevelButton->hide();
             gameWorld.resetToMenu();
+        } else if(gameState == PRELUDE) {
+            gameState = LEVEL_SELECT;
+            preludeStartButton->hide();
+            backButton->show();
+            level1Btn->show(); level2Btn->show(); level3Btn->show();
+            update();
         }
         update();
     });
-    connect(level1Btn, &QPushButton::clicked, [=]() { onLevelSelected(1); });
-    connect(level2Btn, &QPushButton::clicked, [=]() { onLevelSelected(2); });
-    connect(level3Btn, &QPushButton::clicked, [=]() { onLevelSelected(3); });
+    connect(level1Btn, &QPushButton::clicked, [=]() { showPrelude(1); });
+    connect(level2Btn, &QPushButton::clicked, [=]() { showPrelude(2); });
+    connect(level3Btn, &QPushButton::clicked, [=]() { showPrelude(3); });
     connect(nextLevelButton, &QPushButton::clicked, this, &MainWindow::onNextLevel);
     connect(exitAfterLevelButton, &QPushButton::clicked, this, &MainWindow::onExitToMenu);
+    connect(preludeStartButton, &QPushButton::clicked, this, &MainWindow::onStartPrelude);
 }
 
-void MainWindow::onLevelSelected(int level) {
-    gameState = PLAYING;
-    gameWorld.init(level);
-    fartTimer1 = fartTimer2 = 0;
+void MainWindow::showPrelude(int level) {
+    pendingLevel = level;
+    gameState = PRELUDE;
     level1Btn->hide(); level2Btn->hide(); level3Btn->hide();
+    backButton->show();
+    preludeStartButton->show();
+    update();
+}
+
+void MainWindow::onStartPrelude() {
+    gameState = PLAYING;
+    gameWorld.init(pendingLevel);
+    fartTimer1 = fartTimer2 = 0;
+    preludeStartButton->hide();
     backButton->hide();
     startButton->hide(); guideButton->hide(); exitButton->hide();
     gameWorld.setInput(false, false, false, false, false, false, false, false);
     update();
+}
+
+void MainWindow::onLevelSelected(int level) {
+    // 已废弃，保留空函数以解决链接错误
+    Q_UNUSED(level);
 }
 
 void MainWindow::onNextLevel() {
@@ -196,6 +231,7 @@ void MainWindow::updateGame() {
             backButton->show();
             startButton->hide(); guideButton->hide(); exitButton->hide();
             level1Btn->hide(); level2Btn->hide(); level3Btn->hide();
+            nextLevelButton->hide(); exitAfterLevelButton->hide();
         } else if(gameWorld.isLevelComplete()) {
             gameState = LEVEL_COMPLETE;
             nextLevelButton->show();
@@ -219,7 +255,7 @@ void MainWindow::paintEvent(QPaintEvent *) {
         painter.fillRect(rect(), QColor(0,0,0,80));
         painter.setPen(Qt::white);
         painter.setFont(QFont("微软雅黑",40,QFont::Bold));
-        painter.drawText(170,140,"猪猪侠双人冒险");
+        painter.drawText(170,140,"");
         break;
     case GUIDE:
         if(!guidePage.isNull()) painter.drawPixmap(0,0,800,600, guidePage);
@@ -231,15 +267,46 @@ void MainWindow::paintEvent(QPaintEvent *) {
         painter.drawText(100,220,"玩家1：W跳跃  A/D移动  Q攻击");
         painter.drawText(100,300,"玩家2：↑跳跃  ←→移动  K攻击");
         painter.drawText(100,380,"你们的任务就是拾取童年回忆");
-        painter.drawText(100,460,"小心有人会攻击你，你也可以反击");
+        painter.drawText(100,460,"小心路上会有人攻击你");
         break;
     case LEVEL_SELECT:
         painter.drawPixmap(0,0,800,600, levelMapPic);
-        painter.setPen(QColor(255, 255, 0)); // 荧光黄
+        painter.setPen(QColor(255, 255, 0));
         painter.setFont(QFont("微软雅黑", 36, QFont::Bold));
-        // 顶部居中：y = 60
         painter.drawText(QRect(0, 60, 800, 100), Qt::AlignCenter, "选择关卡");
         break;
+    case PRELUDE: {
+        QPixmap prelude;
+        QString title, content;
+        if (pendingLevel == 1) {
+            prelude = preludePic1;
+            title = "童年回忆1";
+            content = "狗熊岭被僵尸入侵了，只有光头强的房子是安全屋，而且里面有充足的物资，快把熊大熊二和光头强都送回安全屋里!";
+        } else if (pendingLevel == 2) {
+            prelude = preludePic2;
+            title = "童年回忆2";
+            content = "图图、小美和刷子逃课一起出去玩，图图妈发现之后非常生气，想要好好收拾图图一顿，快帮他们躲起来！";
+        } else {
+            prelude = preludePic3;
+            title = "童年回忆3";
+            content = "小羊们在村外春游，结果灰太狼又来抓羊了，快把小羊们安全送回羊村！";
+        }
+        if (!prelude.isNull()) {
+            painter.drawPixmap(0, 0, 800, 600, prelude);
+        } else {
+            painter.fillRect(rect(), QColor(0, 0, 0, 200));
+        }
+
+        painter.setPen(Qt::black);
+        painter.setFont(QFont("微软雅黑", 32, QFont::Bold));
+        painter.drawText(QRect(0, 120, 800, 60), Qt::AlignCenter, title);
+
+        painter.setPen(QColor(64, 64, 64));
+        painter.setFont(QFont("微软雅黑", 18));
+        QRect textRect(100, 200, 600, 200);
+        painter.drawText(textRect, Qt::TextWordWrap, content);
+        break;
+    }
     case PLAYING:
         drawGame(painter);
         break;
@@ -253,18 +320,28 @@ void MainWindow::paintEvent(QPaintEvent *) {
         painter.drawText(280,300,"点击下方按钮继续");
         break;
     case GAME_OVER:
-        painter.fillRect(rect(), QColor(0,0,0,200));
+        if (!failBg.isNull()) {
+            painter.drawPixmap(0, 0, 800, 600, failBg);
+        } else {
+            painter.fillRect(rect(), QColor(0,0,0,200));
+        }
         painter.setPen(Qt::red);
-        painter.setFont(QFont("微软雅黑",40,QFont::Bold));
-        painter.drawText(250,280,"游戏结束");
-        painter.setFont(QFont("微软雅黑",20));
-        painter.drawText(300,380,"按返回按钮回主菜单");
+        painter.setFont(QFont("微软雅黑",32,QFont::Bold));
+        painter.drawText(rect(), Qt::AlignCenter, "555解救失败了\n请点返回键再试一次吧");
         break;
     case VICTORY:
-        painter.fillRect(rect(), QColor(0,0,0,200));
+        if (!endBg.isNull()) {
+            painter.drawPixmap(0, 0, 800, 600, endBg);
+        } else {
+            painter.fillRect(rect(), QColor(0,0,0,200));
+        }
+        painter.setPen(Qt::red);
+        painter.setFont(QFont("微软雅黑", 40, QFont::Bold));
+        painter.drawText(QRect(0, 120, 800, 80), Qt::AlignCenter, "恭喜通关！");
         painter.setPen(Qt::yellow);
-        painter.setFont(QFont("微软雅黑",40,QFont::Bold));
-        painter.drawText(220,280,"恭喜通关！");
+        painter.setFont(QFont("微软雅黑", 20));
+        QString victoryText = "亲爱的“大人”，恭喜你成功拾取所有童年回忆！";
+        painter.drawText(QRect(100, 250, 600, 200), Qt::TextWordWrap, victoryText);
         break;
     }
 }
@@ -348,8 +425,13 @@ void MainWindow::drawGame(QPainter &painter) {
     float p1y = gameWorld.getPlayer1().y;
     float p2x = gameWorld.getPlayer2().x - mapOffset;
     float p2y = gameWorld.getPlayer2().y;
-    painter.drawPixmap(p1x, p1y, 60, 80, piggy);
-    painter.drawPixmap(p2x, p2y, 60, 80, lulu);
+
+    bool p1Attack = (gameWorld.getAttackEffectTimer1() > 0);
+    bool p2Attack = (gameWorld.getAttackEffectTimer2() > 0);
+    QPixmap p1Pic = (p1Attack && !piggySuper.isNull()) ? piggySuper : piggy;
+    QPixmap p2Pic = (p2Attack && !luluSuper.isNull()) ? luluSuper : lulu;
+    painter.drawPixmap(p1x, p1y, 60, 80, p1Pic);
+    painter.drawPixmap(p2x, p2y, 60, 80, p2Pic);
 
     if(gameWorld.getPlayer1().carryCount > 0) {
         int type = gameWorld.getPlayer1().carryType;
@@ -392,6 +474,13 @@ void MainWindow::drawGame(QPainter &painter) {
         }
         if (!carryPic.isNull())
             painter.drawPixmap(p2x+5, p2y-50, 50, 60, carryPic);
+    }
+
+    if (p1Attack && !attackEffectPic.isNull()) {
+        painter.drawPixmap(p1x - 20, p1y, 80, 80, attackEffectPic);
+    }
+    if (p2Attack && !attackEffectPic.isNull()) {
+        painter.drawPixmap(p2x - 20, p2y, 80, 80, attackEffectPic);
     }
 
     if(fartTimer1 > 0)

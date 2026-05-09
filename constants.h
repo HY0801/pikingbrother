@@ -5,13 +5,13 @@ enum GameState {
     MENU,
     GUIDE,
     LEVEL_SELECT,
+    PRELUDE,          // 前情提要界面
     PLAYING,
     LEVEL_COMPLETE,
     GAME_OVER,
     VICTORY
 };
 
-// 第一关角色类型
 enum CollectibleType {
     XIONGDA,
     XIONGER,
