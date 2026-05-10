@@ -5,6 +5,9 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QPixmap>
+#include <QSoundEffect>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "gameworld.h"
 #include "constants.h"
 
@@ -23,7 +26,7 @@ protected:
 
 private slots:
     void updateGame();
-    void onLevelSelected(int level);   // 保留声明，但实现为空
+    void onLevelSelected(int level);
     void onNextLevel();
     void onExitToMenu();
     void onStartPrelude();
@@ -55,10 +58,20 @@ private:
 
     int pendingLevel;
 
+    QSoundEffect *fartSound;
+    QSoundEffect *attackSound;
+    QMediaPlayer *bgmPlayer;
+    QAudioOutput *bgmOutput;
+
+    bool aPressed, dPressed, leftPressed, rightPressed, wPressed, upPressed, qPressed, kPressed;
+
     void initUI();
     void loadImages();
     void drawGame(QPainter &painter);
     void showPrelude(int level);
+    void initAudio();
+    void playBGMForState(int forceLevel = -1);
+    void resetKeyStates();
 };
 
 #endif // MAINWINDOW_H

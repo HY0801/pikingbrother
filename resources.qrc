@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/background.png</file>
         <file>res/lulu.png</file>
         <file>res/piggy.png</file>
         <file>res/fart_effect.png</file>
@@ -14,5 +13,35 @@
         <file>res/xiongda.png</file>
         <file>res/xionger.png</file>
         <file>res/zombie.png</file>
+        <file>res/feiyangyang.png</file>
+        <file>res/house2.png</file>
+        <file>res/house3.png</file>
+        <file>res/huitailang.png</file>
+        <file>res/lanyangyang.png</file>
+        <file>res/lulu_super.png</file>
+        <file>res/meiyangyang.png</file>
+        <file>res/nuanyangyang.png</file>
+        <file>res/piggy_super.png</file>
+        <file>res/shuazi.png</file>
+        <file>res/tutu.png</file>
+        <file>res/tutuma.png</file>
+        <file>res/xiaoguai.png</file>
+        <file>res/xiaomei.png</file>
+        <file>res/xiyangyang.png</file>
+        <file>res/background2.png</file>
+        <file>res/background3.png</file>
+        <file>res/background1.png</file>
+        <file>res/gongji_effect.png</file>
+        <file>res/shibai_bg.png</file>
+        <file>res/start3.png</file>
+        <file>res/start2.png</file>
+        <file>res/start1.png</file>
+        <file>res/end.png</file>
+        <file>res/sounds/bgm_level1.mp3</file>
+        <file>res/sounds/bgm_level2.mp3</file>
+        <file>res/sounds/bgm_level3.mp3</file>
+        <file>res/sounds/fart.mp3</file>
+        <file>res/sounds/fart.wav</file>
+        <file>res/sounds/attack.wav</file>
     </qresource>
 </RCC>

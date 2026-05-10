@@ -54,6 +54,11 @@ public:
     int getAttackEffectTimer1() const { return attackEffectTimer1; }
     int getAttackEffectTimer2() const { return attackEffectTimer2; }
 
+    bool isHurt() const { return hurtFlag; }
+    bool isCollect() const { return collectFlag; }
+    bool isDeliver() const { return deliverFlag; }
+    void clearSoundFlags() { hurtFlag = false; collectFlag = false; deliverFlag = false; }
+
     void resetToMenu();
     void nextLevel();
 
@@ -77,11 +82,13 @@ private:
     bool wPressed, upPressed;
     bool qPressed, kPressed;
     int attackCooldown1, attackCooldown2;
-    int attackEffectTimer1, attackEffectTimer2;   // 新增攻击特效计时
+    int attackEffectTimer1, attackEffectTimer2;
 
     QVector<int> savedList;
 
     int invincibleFrames;
+
+    bool hurtFlag, collectFlag, deliverFlag;
 
     void loadLevel(int level);
     void applyGravityAndPlatform(Player &p);

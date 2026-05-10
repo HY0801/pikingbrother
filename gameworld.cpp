@@ -4,11 +4,12 @@
 #include <QDebug>
 
 GameWorld::GameWorld()
-    : lives(3), currentLevel(1), mapOffset(0), gameOverFlag(false), victoryFlag(false),
+    : lives(5), currentLevel(1), mapOffset(0), gameOverFlag(false), victoryFlag(false),
     levelCompleteFlag(false),
     aPressed(false), dPressed(false), leftPressed(false), rightPressed(false),
     wPressed(false), upPressed(false), qPressed(false), kPressed(false),
-    attackCooldown1(0), attackCooldown2(0), attackEffectTimer1(0), attackEffectTimer2(0), invincibleFrames(0)
+    attackCooldown1(0), attackCooldown2(0), attackEffectTimer1(0), attackEffectTimer2(0), invincibleFrames(0),
+    hurtFlag(false), collectFlag(false), deliverFlag(false)
 {
     loadLevel(1);
     resetPositions();
@@ -16,7 +17,7 @@ GameWorld::GameWorld()
 }
 
 void GameWorld::init(int level) {
-    lives = 3;
+    lives = 5;
     currentLevel = level;
     gameOverFlag = false;
     victoryFlag = false;
@@ -26,6 +27,12 @@ void GameWorld::init(int level) {
     attackEffectTimer1 = attackEffectTimer2 = 0;
     savedList.clear();
     invincibleFrames = 30;
+    hurtFlag = false; collectFlag = false; deliverFlag = false;
+
+    // 重置所有按键状态，避免残留输入导致自动移动
+    aPressed = dPressed = leftPressed = rightPressed = false;
+    wPressed = upPressed = qPressed = kPressed = false;
+
     loadLevel(currentLevel);
     resetPositions();
     if (p1.y + PLAYER_HEIGHT > 520) p1.y = 520 - PLAYER_HEIGHT;
@@ -51,7 +58,8 @@ void GameWorld::loadLevel(int level) {
 
     if (level == 1) {
         obstacles.push_back({800, 480, 60, 60});
-        obstacles.push_back({1500, 480, 60, 60});
+        obstacles.push_back({1300, 480, 60, 60});
+        obstacles.push_back({1800, 480, 60, 60});
 
         platforms.push_back({2300, 460, 120, 20});
         platforms.push_back({2500, 420, 120, 20});
@@ -67,50 +75,52 @@ void GameWorld::loadLevel(int level) {
         collectibles.push_back({3960, 230, GUANGTOUQIANG, true});
 
         zombies.push_back({1200, 440, -2, true});
-        zombies.push_back({1800, 440, 2, true});
+        zombies.push_back({2000, 440, 2, true});
     }
     else if (level == 2) {
         obstacles.push_back({700, 480, 60, 60});
-        obstacles.push_back({1200, 480, 60, 60});
-        obstacles.push_back({1800, 480, 60, 60});
-
-        platforms.push_back({2300, 460, 120, 20});
-        collectibles.push_back({2360, 390, TUTU, true});
-        platforms.push_back({2430, 400, 120, 20});
-        collectibles.push_back({2490, 330, XIAOMEI, true});
-        platforms.push_back({2560, 340, 120, 20});
-        collectibles.push_back({2620, 270, XIAOGUAI, true});
-        platforms.push_back({2690, 280, 120, 20});
-        collectibles.push_back({2750, 210, SHUAZI, true});
-
-        zombies.push_back({1100, 440, -2, true});
-        zombies.push_back({1600, 440, 2, true});
-        zombies.push_back({2100, 440, -1, true});
-        zombies.push_back({2800, 440, 1, true});
-    }
-    else if (level == 3) {
-        obstacles.push_back({600, 480, 60, 60});
         obstacles.push_back({1100, 480, 60, 60});
         obstacles.push_back({1600, 480, 60, 60});
         obstacles.push_back({2100, 480, 60, 60});
 
         platforms.push_back({2500, 460, 120, 20});
-        collectibles.push_back({2560, 390, XIYANGYANG, true});
+        collectibles.push_back({2560, 390, TUTU, true});
         platforms.push_back({2630, 400, 120, 20});
-        collectibles.push_back({2690, 330, MEIYANGYANG, true});
+        collectibles.push_back({2690, 330, XIAOMEI, true});
         platforms.push_back({2760, 340, 120, 20});
-        collectibles.push_back({2820, 270, NUANYANGYANG, true});
+        collectibles.push_back({2820, 270, XIAOGUAI, true});
         platforms.push_back({2890, 280, 120, 20});
-        collectibles.push_back({2950, 210, FEIYANGYANG, true});
-        platforms.push_back({3020, 220, 120, 20});
-        collectibles.push_back({3080, 150, LANYANGYANG, true});
+        collectibles.push_back({2950, 210, SHUAZI, true});
 
         zombies.push_back({900, 440, -2, true});
-        zombies.push_back({1300, 440, 2, true});
-        zombies.push_back({1800, 440, -1, true});
-        zombies.push_back({2300, 440, 1, true});
-        zombies.push_back({2900, 440, -2, true});
-        zombies.push_back({3300, 440, 2, true});
+        zombies.push_back({1400, 440, 2, true});
+        zombies.push_back({1900, 440, -1, true});
+        zombies.push_back({2400, 440, 1, true});
+    }
+    else if (level == 3) {
+        obstacles.push_back({600, 480, 60, 60});
+        obstacles.push_back({1000, 480, 60, 60});
+        obstacles.push_back({1400, 480, 60, 60});
+        obstacles.push_back({1800, 480, 60, 60});
+        obstacles.push_back({2200, 480, 60, 60});
+
+        platforms.push_back({2600, 460, 120, 20});
+        collectibles.push_back({2660, 390, XIYANGYANG, true});
+        platforms.push_back({2730, 400, 120, 20});
+        collectibles.push_back({2790, 330, MEIYANGYANG, true});
+        platforms.push_back({2860, 340, 120, 20});
+        collectibles.push_back({2920, 270, NUANYANGYANG, true});
+        platforms.push_back({2990, 280, 120, 20});
+        collectibles.push_back({3050, 210, FEIYANGYANG, true});
+        platforms.push_back({3120, 220, 120, 20});
+        collectibles.push_back({3180, 150, LANYANGYANG, true});
+
+        zombies.push_back({800, 440, -2, true});
+        zombies.push_back({1200, 440, 2, true});
+        zombies.push_back({1600, 440, -1, true});
+        zombies.push_back({2000, 440, 1, true});
+        zombies.push_back({2400, 440, -2, true});
+        zombies.push_back({2800, 440, 2, true});
     }
 }
 
@@ -126,11 +136,12 @@ void GameWorld::update() {
     if (invincibleFrames > 0) invincibleFrames--;
 
     float moveSpeed = 6;
-    if(aPressed) p1.move(-moveSpeed);
-    if(dPressed) p1.move(moveSpeed);
-    if(leftPressed) p2.move(-moveSpeed);
-    if(rightPressed) p2.move(moveSpeed);
+    if(aPressed) p1.x -= moveSpeed;
+    if(dPressed) p1.x += moveSpeed;
+    if(leftPressed) p2.x -= moveSpeed;
+    if(rightPressed) p2.x += moveSpeed;
 
+    // 双人中心跟随
     float centerX = (p1.x + p2.x) / 2.0f;
     float targetOffset = centerX - 400;
     if(targetOffset < 0) targetOffset = 0;
@@ -142,15 +153,14 @@ void GameWorld::update() {
     if(p2.x < 0) p2.x = 0;
     if(p2.x > 5000 - 60) p2.x = 5000 - 60;
 
-    if(wPressed) p1.jump();
-    if(upPressed) p2.jump();
+    if(wPressed && p1.onGround) p1.jump();
+    if(upPressed && p2.onGround) p2.jump();
 
     if(attackCooldown1 > 0) attackCooldown1--;
     if(attackCooldown2 > 0) attackCooldown2--;
-
     if(qPressed && attackCooldown1 == 0) {
         attackCooldown1 = 15;
-        attackEffectTimer1 = 20;   // 改为20，延长变身时间
+        attackEffectTimer1 = 20;
         QRectF attackRect(p1.x-40, p1.y, 140, 80);
         for(auto& z : zombies) {
             if(z.alive && attackRect.intersects(z.rect()))
@@ -159,7 +169,7 @@ void GameWorld::update() {
     }
     if(kPressed && attackCooldown2 == 0) {
         attackCooldown2 = 15;
-        attackEffectTimer2 = 20;   // 改为20
+        attackEffectTimer2 = 20;
         QRectF attackRect(p2.x-40, p2.y, 140, 80);
         for(auto& z : zombies) {
             if(z.alive && attackRect.intersects(z.rect()))
@@ -212,7 +222,10 @@ void GameWorld::applyGravityAndPlatform(Player &p) {
     p.onGround = grounded;
 
     if (p.y > 650 && p.x > 200) {
-        if (invincibleFrames == 0 && lives > 0) lives--;
+        if (invincibleFrames == 0 && lives > 0) {
+            lives--;
+            hurtFlag = true;
+        }
         resetPositions();
         p1.carryCount = 0; p1.carryType = -1;
         p2.carryCount = 0; p2.carryType = -1;
@@ -226,16 +239,19 @@ void GameWorld::applyGravityAndPlatform(Player &p) {
 }
 
 void GameWorld::updateZombies() {
+    if (invincibleFrames > 0) return;
+
     for(auto& z : zombies) {
         if(!z.alive) continue;
         z.x += z.vx;
         if(z.x < 200 || z.x > 4800) z.vx = -z.vx;
         QRectF zRect = z.rect();
         if(zRect.intersects(p1.rect()) || zRect.intersects(p2.rect())) {
-            if (invincibleFrames == 0 && lives > 0) {
+            if (lives > 0) {
                 lives--;
-                invincibleFrames = 15;
+                hurtFlag = true;
             }
+            invincibleFrames = 30;
             if (lives <= 0) gameOverFlag = true;
             return;
         }
@@ -250,11 +266,13 @@ void GameWorld::checkCollectAndDelivery() {
             c.exists = false;
             p1.carryCount = 1;
             p1.carryType = c.type;
+            collectFlag = true;
         }
         else if(collectRect.intersects(p2.rect()) && p2.carryCount == 0) {
             c.exists = false;
             p2.carryCount = 1;
             p2.carryType = c.type;
+            collectFlag = true;
         }
     }
 
@@ -262,6 +280,7 @@ void GameWorld::checkCollectAndDelivery() {
     if(houseRect.intersects(p1.rect()) && p1.carryCount > 0) {
         if (!savedList.contains(p1.carryType)) {
             savedList.append(p1.carryType);
+            deliverFlag = true;
         }
         p1.carryCount = 0;
         p1.carryType = -1;
@@ -269,6 +288,7 @@ void GameWorld::checkCollectAndDelivery() {
     if(houseRect.intersects(p2.rect()) && p2.carryCount > 0) {
         if (!savedList.contains(p2.carryType)) {
             savedList.append(p2.carryType);
+            deliverFlag = true;
         }
         p2.carryCount = 0;
         p2.carryType = -1;
@@ -282,8 +302,11 @@ void GameWorld::checkDeathAndRespawn() {
     for(auto& obs : obstacles) {
         QPointF center(obs.x + obs.w/2, obs.y + obs.h/2);
         if(p1r.contains(center) || p2r.contains(center)) {
-            if (lives > 0) lives--;
-            invincibleFrames = 15;
+            if (lives > 0) {
+                lives--;
+                hurtFlag = true;
+            }
+            invincibleFrames = 30;
             if (lives <= 0) gameOverFlag = true;
             return;
         }
@@ -309,7 +332,7 @@ void GameWorld::checkLevelComplete() {
 }
 
 void GameWorld::resetToMenu() {
-    lives = 3;
+    lives = 5;
     currentLevel = 1;
     gameOverFlag = false;
     victoryFlag = false;
@@ -319,6 +342,10 @@ void GameWorld::resetToMenu() {
     attackEffectTimer1 = attackEffectTimer2 = 0;
     savedList.clear();
     invincibleFrames = 30;
+    hurtFlag = collectFlag = deliverFlag = false;
+    // 重置按键
+    aPressed = dPressed = leftPressed = rightPressed = false;
+    wPressed = upPressed = qPressed = kPressed = false;
     loadLevel(currentLevel);
     resetPositions();
 }
@@ -327,9 +354,13 @@ void GameWorld::nextLevel() {
     if(currentLevel < 3 && levelCompleteFlag) {
         currentLevel++;
         levelCompleteFlag = false;
-        lives = 3;
+        lives = 5;
         savedList.clear();
         invincibleFrames = 30;
+        hurtFlag = collectFlag = deliverFlag = false;
+        // 重置按键
+        aPressed = dPressed = leftPressed = rightPressed = false;
+        wPressed = upPressed = qPressed = kPressed = false;
         loadLevel(currentLevel);
         resetPositions();
         mapOffset = 0;
